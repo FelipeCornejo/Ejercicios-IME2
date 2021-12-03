@@ -1,0 +1,3 @@
+library(MASS)
+
+data(birthwt)
