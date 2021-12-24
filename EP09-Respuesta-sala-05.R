@@ -1,3 +1,7 @@
+#Integrantes
+#Nombre: Sofia Castro; RUT: 20.055.286-5
+#Nombre: Felipe Cornejo; RUT: 20.427.782-6
+#Nombre: Gianfranco Piccinini; Rut: 20.237.081-0
 library(dplyr)
 library ( tidyverse )
 library ( ggpubr )
