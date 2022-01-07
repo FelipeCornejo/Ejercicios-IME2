@@ -10,7 +10,7 @@ library(readxl)
 library(boot)
 install.packages('simpleboot')
 library(simpleboot)
-datosI <- readxl::read_xls("/Users/macbookair/Downloads/Datos-Casen-v2.xls")
+datosI <- readxl::read_xls(choose.files())
 datosS <- datosI %>% select(esc,s4)
 datosS12 <-datosS %>% filter(esc==12)
 datosS12 <-datosS12 %>% select(s4)
@@ -67,7 +67,7 @@ print(histograma)
 #en favor de la hipotesis alternativa, por lo que las personas con 12 a√±os de escolaridad
 #poseen mayor cantidad de hijos que los de 18 a√±os de escolaridad.
 
-datos <- readxl::read_xls("/Users/macbookair/Downloads/Datos-Casen-v2.xls")
+
 
 #PREGUNTA 2: Bootstrapping
 #El ingreso per capita es similar en hombres solteros de la region metropolitana
@@ -78,19 +78,20 @@ datos <- readxl::read_xls("/Users/macbookair/Downloads/Datos-Casen-v2.xls")
 #H0: Las 3 medias se distribuyen de manera similar entre si
 #HA: Las 3 medias se distribuyen de manera diferente entre si
 
+datos <- readxl::read_xls(choose.files())
 B <- 2000
 alfa <- 0.05
 set.seed(523)
 
 datos2 <- select(datos,region,sexo,ecivil,ytotcorh,numper)
 
-hs_metropolitana <- filter(datos2, region == "RegiÔøΩn Metropolitana de Santiago", sexo == "Hombre", ecivil == "Soltero(a)")
+hs_metropolitana <- filter(datos2, region == "RegiÛn Metropolitana de Santiago", sexo == "Hombre", ecivil == "Soltero(a)")
 hs_metropolitana <- mutate(hs_metropolitana, pib = ytotcorh / as.integer(numper)) %>% na.omit(hs_metropolitana)
 
-hs_valparaiso <- filter(datos2, region == "RegiÔøΩn de ValparaÔøΩso", sexo == "Hombre", ecivil == "Soltero(a)")
+hs_valparaiso <- filter(datos2, region == "RegiÛn de ValparaÌso", sexo == "Hombre", ecivil == "Soltero(a)")
 hs_valparaiso <- mutate(hs_valparaiso, pib = ytotcorh / as.integer(numper))
 
-hs_biobio <- filter(datos2, region == "RegiÔøΩn del BiobÔøΩo", sexo == "Hombre", ecivil == "Soltero(a)")
+hs_biobio <- filter(datos2, region == "RegiÛn del BiobÌo", sexo == "Hombre", ecivil == "Soltero(a)")
 hs_biobio <- mutate(hs_biobio, pib = ytotcorh / as.integer(numper))
 
 #Muestra de tamao n = 450
@@ -155,17 +156,17 @@ print(qqmv)
 print(qqmb)
 print(qqvb)
 
-cat("DistribuciÔøΩn bootstrap entre region m y region v:\n")
+cat("DistribuciÛn bootstrap entre region m y region v:\n")
 cat ("\tMedia :", mean(valoresmv$valoresmv,na.rm = TRUE),"\n")
-cat ("\tDesviaciÔøΩn estÔøΩndar:", sd(valoresmv$valoresmv,na.rm = TRUE) , "\n\n")
+cat ("\tDesviaciÛn est·ndar:", sd(valoresmv$valoresmv,na.rm = TRUE) , "\n\n")
 
-cat("DistribuciÔøΩn bootstrap entre region m y region b:\n")
+cat("DistribuciÛn bootstrap entre region m y region b:\n")
 cat ("\tMedia :", mean(valoresmb$valoresmb,na.rm = TRUE),"\n")
-cat ("\tDesviaciÔøΩn estÔøΩndar:", sd(valoresmb$valoresmb,na.rm = TRUE) , "\n\n")
+cat ("\tDesviaciÛn est·ndar:", sd(valoresmb$valoresmb,na.rm = TRUE) , "\n\n")
 
-cat("DistribuciÔøΩn bootstrap entre region v y region b:\n")
+cat("DistribuciÛn bootstrap entre region v y region b:\n")
 cat ("\tMedia :", mean(valoresvb$valoresvb,na.rm = TRUE),"\n")
-cat ("\tDesviaciÔøΩn estÔøΩndar:", sd(valoresvb$valoresvb,na.rm = TRUE) , "\n\n")
+cat ("\tDesviaciÛn est·ndar:", sd(valoresvb$valoresvb,na.rm = TRUE) , "\n\n")
 
 #INTERVALOS DE CONFIANZA
 intervalomv <- boot.ci(bootstrapmv, conf = 1-alfa, type = "norm")
@@ -178,7 +179,10 @@ print(intervalovb)
 
 #A partir de los resultados entregados por los histogramas y los graficos qq:
 #-Las medias m y v tienen una distribucion distinta de la normal (inclinada a la izquierda)
-#-Las medias m y b tienen una distribucion normal
+#-Las medias m y b tienen una distribucion cercana a la normal
 #-Las medias v y b tienen una distribucion distinta de la normal (inclinada a la derecha)
-#Por lo tanto, las medias se distribuyen de manera diferente entre si, entonces se rechaza H0.
+
+#Por lo tanto, las medias del ingreso per capita de los hombres solteros
+#de las regiones metropolitana (m), valparaiso (v) y biobio (b) se distribuyen 
+#de manera diferente entre si, entonces, con un 95% de confianza, se rechaza H0.
 
