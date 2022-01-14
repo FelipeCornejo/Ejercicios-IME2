@@ -1,4 +1,7 @@
 # NOMBRES :
+#Nombre: Sofia Castro; RUT: 20.055.286-5
+#Nombre: Felipe Cornejo; RUT: 20.427.782-6
+#Nombre: Gianfranco Piccinini; Rut: 20.237.081-0
 library(pROC)
 library(caret)
 library(dplyr)
@@ -7,9 +10,10 @@ library(scatterplot3d)
 library(dplyr)
 library(leaps)
 library(car)
-datos <- read.csv("/Users/macbookair/Downloads/body.csv", sep="")
+datos <- read.csv(choose.files(),sep = ";")
 #Se propone utilizar la misma semilla que en la experiencia anterior, los ultimos 4 digitos del rut del menor del grupo T-T
 set.seed(7782)
+#Se calcula el IMC
 imc <- datos[["Weight"]] / ((datos[["Height"]]/100)**2)
 EN<-imc
 EN[EN < 25.0] <- 0
@@ -40,7 +44,7 @@ print(modelo_lineal)
 probs_e <- predict(modelo_lineal , muestra , type = "response")
 ROC_p <- roc(muestra[["EN"]], probs_e )
 plot(ROC_p)
-#Se obtiene un coeficiente de correlaciÃ³n de 0.5648
+#Se obtiene un coeficiente de correlación de 0.5648
 modelo_ajustado <- train(EN ~ Navel.Girth, data = muestra , method = "glm",
                          family = binomial(link ="logit"),
                          trControl=trainControl( method="cv", number = 5,savePredictions =TRUE))      
@@ -58,8 +62,8 @@ modelo_logistico <- update(modelo_lineal, . ~ . + m_1[,1] +m_2[,1]+m_3[,1])
 cat("=== Modelo con predictores agregados ===\ n")
 print(modelo_logistico)
 
-# Verificaci Ã³n de multicolinealidad .
-cat(" Verificaci Ã³n de colinealidad \n")
+# Verificación de multicolinealidad .
+cat(" Verificación de colinealidad \n")
 cat(" --------------------------------------\n")
 cat("\ nVIF :\n")
 vifs <- vif(modelo_logistico)
@@ -67,14 +71,14 @@ print( vifs )
 cat("\ nPromedio VIF: ")
 print( mean ( vifs ))
 # Independencia de los residuos .
-cat(" VerificaciÃ³n de independencia de los residuos \n")
+cat(" Verificación de independencia de los residuos \n")
 cat(" --------------------------------------\n")
 print(durbinWatsonTest( modelo_logistico , max.lag = 5))
-# Detectar posibles valores atÃ­ picos .
-cat("IdentificaciÃ³n de posibles valores atÃ­picos \n")
+# Detectar posibles valores atípicos .
+cat("Identificación de posibles valores atípicos \n")
 cat("--------------------------------------\n")
 plot(modelo_logistico)
-# Obtener los residuos y las estadÃ­sticas.
+# Obtener los residuos y las estadísticas.
 output <- data.frame( predicted.probabilities = fitted(modelo_logistico))
 output[["standardized.residuals"]] <- rstandard(modelo_logistico)
 output[["studentized.residuals"]] <- rstudent(modelo_logistico)
@@ -114,7 +118,7 @@ cat("\n\n")
 cat(" Residuales con DFBeta sobre 1\n")
 cat(" -----------------------------\n")
 print(rownames(muestra[sospechosos4,]))
-# Detalle de las observaciones posiblemente atÃ­ picas .
+# Detalle de las observaciones posiblemente atípicas .
 sospechosos <- c(sospechosos1 , sospechosos2 , sospechosos3 , sospechosos4 )
 sospechosos <- sort(unique(sospechosos))
 cat("\n\n")
@@ -123,7 +127,7 @@ cat(" -----------------\n")
 print(muestra[sospechosos,])
 cat("\n\n")
 print(output[ sospechosos,])
-#ValidaciÃ³n cruzada
+#Validación cruzada
 
 datos_7<- muestra[,c("Biiliac.diameter","Navel.Girth","Ankle.Minimum.Girth","Age","EN")][-1]
 n <- nrow(datos_7)
@@ -142,4 +146,12 @@ extra <- as.numeric(as.character(prueba$EN))
 error <- extra - predicciones
 mse_prueba <- mean( error ** 2)
 cat("MSE para el conjunto de prueba :", mse_prueba)
+
+#En los graficos existen valores atípicos, los cuales resaltan reiteradamente, influyendo en los resultados visualizados en
+#Los graficos, estas observaciones son la 80, 88 y 491, la cual esta última en el grafico de distancia de Cook se puede ver que
+#realiza un apalancamiento mayor en la gráfica, llevando la distancia de Cook a casi 1.
+
+#Realizando la comparación entre el modelo de regresión logística de una variable, se puede ver que que la presición es de 0.88
+#junto con una sensitividad de 0,9375 y especifidad de 0,7778. considerando que la variable escogida para el modelo de regresion logistica
+#simple, es de 0.54 > 0.5 se considerará levemente fuerte, y una relación correcta.
 
